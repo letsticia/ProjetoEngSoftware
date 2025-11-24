@@ -25,7 +25,7 @@ class Sequencial(Questao):
 
         cores_botao = ["azul", "vermelho", "verde", "laranja"]
         
-        buttons_y = y + len(lines) * line_height + 220
+        buttons_y = y + len(lines) * line_height + 320
 
         for i, opcao in enumerate(self.opcoes):
             botao_opcao_image = pygame.image.load(f"src/img/botao/botao_{cores_botao[i]}.png").convert_alpha()
@@ -52,7 +52,7 @@ class Sequencial(Questao):
 
        
         resposta_x = 50
-        resposta_y = buttons_y - 120
+        resposta_y = buttons_y - 220
         label_font = pygame.font.Font("src/fonts/Grand9K Pixel.ttf", 22)
       
         label_surf = label_font.render("Resposta:   ", True, (255, 165, 0))
@@ -60,16 +60,18 @@ class Sequencial(Questao):
         screen.blit(label_surf, (resposta_x, resposta_y))
 
    
-        selected_text = " ".join(self.selected)
         selected_font = pygame.font.Font("src/fonts/Grand9K Pixel.ttf", 22)
-        selected_surf = selected_font.render(selected_text, True, (10, 10, 10))
-        screen.blit(selected_surf, (resposta_x + 120, resposta_y))
+        
+        for idx, item in enumerate(self.selected):
+            sel_surf = selected_font.render(item, True, (10, 10, 10))
+            line_y = resposta_y + idx * (selected_font.get_linesize() + 4)
+            screen.blit(sel_surf, (resposta_x + 120, line_y))
 
       
         if self.feedback is not None:
             fb_color = (34, 139, 34) if self.feedback == "correto" else (178, 34, 34)
             fb_surf = label_font.render(self.feedback.upper(), True, fb_color)
-            screen.blit(fb_surf, (resposta_x, resposta_y + 40))
+            screen.blit(fb_surf, (resposta_x + 500, resposta_y))
         
             if self.feedback == "correto":
                 return True
@@ -84,10 +86,11 @@ pygame.init()
 screen = pygame.display.set_mode((1000, 700))
 clock = pygame.time.Clock()
 questao = Sequencial(
-    "Coloque as palavras na ordem correta para formar uma frase em Python:",
-    ["mundo", "Olá", "!"],
-    ["Olá", "mundo", "!"]
+    "Coloque em ordem as etapas corretas para somar dois números em Portugol:",
+    ["S <- A + B", "ler A", "escrever S", "ler B"],
+    ["ler A", "ler B", "S <- A + B", "escrever S"]
 )
+
 running = True
 while running:
     for event in pygame.event.get():
