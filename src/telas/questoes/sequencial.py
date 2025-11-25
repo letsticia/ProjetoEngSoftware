@@ -1,6 +1,7 @@
 import pygame
 from src.componentes.botao import Botao
 from src.telas.questoes.questao import Questao
+from src.db.supabase_class import SupabaseClient
 import os
 
 class Sequencial(Questao):
@@ -8,11 +9,15 @@ class Sequencial(Questao):
         super().__init__(enunciado, opcoes, resposta_correta)
        
         self.selected = []
-        self.feedback = None  # 
-        self.locked = False  
+        self.feedback = None 
+        self.locked = False
     
-    def tela_sequencial(self, screen):
+    def tela(self, screen, vidas):
         font = pygame.font.Font("src/fonts/Grand9K Pixel.ttf", 26)
+        img_coracao = pygame.image.load("src/img/coracao.png").convert_alpha()
+        img_coracao = pygame.transform.scale(img_coracao, (30, 30))
+        for i in range(vidas):
+            screen.blit(img_coracao, (800 + i * 40, 10))
 
         x, y = 50, 50
         max_width = screen.get_width() - x - 50 
@@ -81,26 +86,3 @@ class Sequencial(Questao):
     def verificar_resposta(self, resposta):
         return super().verificar_resposta(resposta)
 
-
-pygame.init()
-screen = pygame.display.set_mode((1000, 700))
-clock = pygame.time.Clock()
-questao = Sequencial(
-    "Coloque em ordem as etapas corretas para somar dois números em Portugol:",
-    ["S <- A + B", "ler A", "escrever S", "ler B"],
-    ["ler A", "ler B", "S <- A + B", "escrever S"]
-)
-
-running = True
-while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-
-    screen.fill((252, 255, 217))
-    
-    questao.tela_sequencial(screen)
-   
-    pygame.display.flip()
-    clock.tick(60)
-pygame.quit()
