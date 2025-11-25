@@ -10,8 +10,14 @@ class Quiz(Questao):
         self.locked = False
 
     
-    def tela_quiz(self, screen):
+    def tela(self, screen, vidas):
         font = pygame.font.Font("src/fonts/Grand9K Pixel.ttf", 26)
+
+        img_coracao = pygame.image.load("src/img/coracao.png").convert_alpha()
+        img_coracao = pygame.transform.scale(img_coracao, (30, 30))
+
+        for i in range(vidas):
+            screen.blit(img_coracao, (800 + i * 40, 10))
 
         x, y = 50, 50
         max_width = screen.get_width() - x - 50 
@@ -54,27 +60,3 @@ class Quiz(Questao):
             
     def verificar_resposta(self, resposta):
         return super().verificar_resposta(resposta)
-
-pygame.init()
-screen = pygame.display.set_mode((1000, 700))
-clock = pygame.time.Clock()
-questao = Quiz(
-    "Qual é a palavra chave para o tipo de dado que representa números inteiros?",
-    ["int", "float", "char", "bool"],
-    "int"
-)
-running = True
-while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-
-    screen.fill((252, 255, 217))
-    
-    questao.tela_quiz(screen)
-   
-    pygame.display.flip()
-    clock.tick(60)
-pygame.quit()
-
-    
