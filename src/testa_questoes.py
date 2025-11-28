@@ -10,10 +10,10 @@ clock = pygame.time.Clock()
 
 
 todas_salas = [
-    Sala("Variáveis", 0),
-    Sala("Estruturas Condicionais", 1),
-    Sala("Laços de Repetição", 2),
-    Sala("Funções", 3)
+    Sala("Variáveis", 0, screen, clock),
+    Sala("Estruturas Condicionais", 1, screen, clock),
+    Sala("Laços de Repetição", 2, screen, clock),
+    Sala("Funções", 3, screen, clock)
 ]
 
 vidas = 3
@@ -22,6 +22,7 @@ questoes = sala.embaralha_questoes()
 
 running = True
 numero_fase = 0
+sala_started = False
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -29,11 +30,15 @@ while running:
 
     screen.fill((252, 255, 217))
     
-    resposta = questoes[numero_fase].tela(screen, vidas)
-   
-    pygame.display.flip()
-    clock.tick(60)
+    if numero_fase == 0 and not sala_started:
+        sala.tela_sala()
+        sala_started = True
 
+    resposta = questoes[numero_fase].tela(screen, vidas)
+    
+    pygame.display.flip() 
+    clock.tick(60)
+    
     if resposta == True:
         print("Usuário acertou a questão!")
         numero_fase += 1
@@ -55,6 +60,6 @@ while running:
         sala = todas_salas[sala.numero_sala + 1]
         questoes = sala.embaralha_questoes()
         numero_fase = 0
-
+        sala_started = False
 
 pygame.quit()

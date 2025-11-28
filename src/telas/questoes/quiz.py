@@ -1,6 +1,7 @@
 import pygame
 from src.telas.questoes.questao import Questao
 from src.componentes.botao import Botao
+from src.componentes.coracao import sprite_coracao
 import os
 
 class Quiz(Questao):
@@ -13,11 +14,7 @@ class Quiz(Questao):
     def tela(self, screen, vidas):
         font = pygame.font.Font("src/fonts/Grand9K Pixel.ttf", 26)
 
-        img_coracao = pygame.image.load("src/img/coracao.png").convert_alpha()
-        img_coracao = pygame.transform.scale(img_coracao, (30, 30))
-
-        for i in range(vidas):
-            screen.blit(img_coracao, (800 + i * 40, 10))
+        sprite_coracao(screen, vidas)
 
         x, y = 50, 50
         max_width = screen.get_width() - x - 50 

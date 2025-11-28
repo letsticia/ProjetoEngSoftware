@@ -1,5 +1,5 @@
 from src.db.supabase_class import SupabaseClient
-
+import pygame
 sb_client = SupabaseClient()
 
 def questao_sequencial(indice):
@@ -41,5 +41,3 @@ def questao_quiz(indice):
         resposta_correta=resposta_correta
     )
     return questao
-
-
