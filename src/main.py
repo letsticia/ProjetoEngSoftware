@@ -70,13 +70,13 @@ while running:
 
     if vidas == 0:
         print("Game Over!")
-        supabase.client.table("resultados").update({f"score_{sala.numero_sala + 1}": questoes_certas}).eq("id_aluno", usuario['user']['id_usuario']).execute()
+        supabase.client.table("resultados").update({f"score_{sala.numero_sala + 1}": questoes_certas}).eq("id_aluno", usuario['id_usuario']).execute()
         running = False
     
     if numero_fase >= len(questoes):
         print("Parabéns! Você completou todas as questões da sala.")
         
-        supabase.client.table("resultados").update({f"score_{sala.numero_sala + 1}": questoes_certas}).eq("id_aluno", usuario['user']['id_usuario']).execute()
+        supabase.client.table("resultados").update({f"score_{sala.numero_sala + 1}": questoes_certas}).eq("id_aluno", usuario['id_usuario']).execute()
 
 
         sala = todas_salas[sala.numero_sala + 1]

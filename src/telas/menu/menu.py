@@ -41,7 +41,7 @@ class MenuTela:
             if botao_jogar.draw(self.screen):
                 return True
             if botao_progresso.draw(self.screen):
-                progresso_tela = ProgressoTela(self.screen, self.usuario['user']['id_usuario'])
+                progresso_tela = ProgressoTela(self.screen, self.usuario['id_usuario'])
                 progresso_surf = progresso_tela.mostrar_progresso()
             if botao_sair.draw(self.screen):
                 pygame.quit()
