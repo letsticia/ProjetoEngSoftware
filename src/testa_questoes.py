@@ -3,10 +3,18 @@
 import pygame
 from time import sleep
 from src.telas.salas.sala import Sala
+from src.telas.login.login import LoginScreen
 
 pygame.init()
 screen = pygame.display.set_mode((1000, 700))
 clock = pygame.time.Clock()
+
+# Exigir autenticação antes de prosseguir
+login = LoginScreen(screen, clock)
+autenticated = login.run()
+if not autenticated:
+    pygame.quit()
+    raise SystemExit("Autenticação necessária para conectar.")
 
 
 todas_salas = [

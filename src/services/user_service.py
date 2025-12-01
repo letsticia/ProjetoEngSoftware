@@ -9,6 +9,42 @@ class UserService:
         self.repo = UserRepository()
         self.client = SupabaseClient().client
 
+    def autenticar(self, email: str, senha: str) -> dict:
+        """Tenta autenticar usando o serviço de auth do Supabase. Se não for possível,
+        verifica a tabela `usuarios` como fallback (comparação simples de senha).
+        Retorna um dict com dados do usuário em caso de sucesso ou lança Exception."""
+        try:
+            if not self._validar_email(email):
+                raise ValueError("Email inválido")
+
+            if not self._validar_senha(senha):
+                raise ValueError("Senha inválida")
+
+            # Tenta autenticar via Supabase Auth (se disponível)
+            try:
+                # Método compatível com supabase-py recente
+                auth_res = self.client.auth.sign_in_with_password({"email": email, "password": senha})
+                # `sign_in_with_password` pode retornar dict ou objeto com `user`/`data`
+                if isinstance(auth_res, dict) and (auth_res.get("user") or auth_res.get("data")):
+                    return auth_res
+                # Alguns retornos têm chave 'data' com 'user'
+                if hasattr(auth_res, "data") and auth_res.data:
+                    return {"user": auth_res.data}
+            except Exception:
+                # Se a autenticação via auth não estiver configurada, tentar fallback
+                pass
+
+            # Fallback: buscar usuário na tabela `usuarios` e comparar a senha diretamente
+            users = self.client.table("usuarios").select("*").eq("email", email).execute()
+            if users and getattr(users, 'data', None):
+                u = users.data[0]
+                if u.get("senha") == senha:
+                    return {"user": u}
+
+            raise Exception("Credenciais inválidas")
+        except Exception as e:
+            raise Exception(str(e))
+
     def _validar_email(self, email: str) -> bool:
         """Valida formato de email"""
         pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
