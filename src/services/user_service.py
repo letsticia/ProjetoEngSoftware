@@ -2,48 +2,13 @@ from typing import Dict, Any, Optional, List
 import re
 from src.repositories.user_repository import UserRepository
 from src.db.supabase_class import SupabaseClient
+from src.utils.security import hash_password, verify_password
 from postgrest.exceptions import APIError
 
 class UserService:
     def __init__(self):
         self.repo = UserRepository()
         self.client = SupabaseClient().client
-
-    def autenticar(self, email: str, senha: str) -> dict:
-        """Tenta autenticar usando o serviço de auth do Supabase. Se não for possível,
-        verifica a tabela `usuarios` como fallback (comparação simples de senha).
-        Retorna um dict com dados do usuário em caso de sucesso ou lança Exception."""
-        try:
-            if not self._validar_email(email):
-                raise ValueError("Email inválido")
-
-            if not self._validar_senha(senha):
-                raise ValueError("Senha inválida")
-
-            # Tenta autenticar via Supabase Auth (se disponível)
-            try:
-                # Método compatível com supabase-py recente
-                auth_res = self.client.auth.sign_in_with_password({"email": email, "password": senha})
-                # `sign_in_with_password` pode retornar dict ou objeto com `user`/`data`
-                if isinstance(auth_res, dict) and (auth_res.get("user") or auth_res.get("data")):
-                    return auth_res
-                # Alguns retornos têm chave 'data' com 'user'
-                if hasattr(auth_res, "data") and auth_res.data:
-                    return {"user": auth_res.data}
-            except Exception:
-                # Se a autenticação via auth não estiver configurada, tentar fallback
-                pass
-
-            # Fallback: buscar usuário na tabela `usuarios` e comparar a senha diretamente
-            users = self.client.table("usuarios").select("*").eq("email", email).execute()
-            if users and getattr(users, 'data', None):
-                u = users.data[0]
-                if u.get("senha") == senha:
-                    return {"user": u}
-
-            raise Exception("Credenciais inválidas")
-        except Exception as e:
-            raise Exception(str(e))
 
     def _validar_email(self, email: str) -> bool:
         """Valida formato de email"""
@@ -80,6 +45,8 @@ class UserService:
     def criar_usuario_basico(self, payload: Dict[str, Any]) -> Dict[str, Any]:
         try:
             self._validar_usuario_basico(payload)
+            # Hash da senha antes de salvar
+            payload["senha"] = hash_password(payload["senha"])
             return self.repo.create_usuario(payload)
         except ValueError as e:
             raise Exception(f"Validação falhou: {str(e)}")
@@ -98,6 +65,8 @@ class UserService:
                 raise ValueError("Departamento deve ter no mínimo 2 caracteres")
             
             payload_usuario["tipo"] = "professor"
+            # Hash da senha antes de salvar
+            payload_usuario["senha"] = hash_password(payload_usuario["senha"])
             usuario = self.repo.create_usuario(payload_usuario)
             payload_prof["id_prof"] = usuario["id_usuario"]
             prof_data = self.client.table("professores").insert(payload_prof).execute()
@@ -128,6 +97,8 @@ class UserService:
                 raise ValueError("ID da turma deve ser um número positivo")
             
             payload_usuario["tipo"] = "aluno"
+            # Hash da senha antes de salvar
+            payload_usuario["senha"] = hash_password(payload_usuario["senha"])
             usuario = self.repo.create_usuario(payload_usuario)
             payload_aluno["id_aluno"] = usuario["id_usuario"]
             aluno_data = self.client.table("alunos").insert(payload_aluno).execute()
@@ -139,9 +110,43 @@ class UserService:
         except Exception as e:
             raise Exception(f"Erro inesperado ao criar aluno: {str(e)}")
 
+    def autenticar(self, email: str, senha: str) -> Optional[Dict[str, Any]]:
+        """
+        Autentica um usuário
+        
+        Args:
+            email: Email do usuário
+            senha: Senha em texto plano
+            
+        Returns:
+            Dados do usuário se autenticado, None caso contrário
+        """
+        try:
+            # Buscar usuário por email
+            response = self.client.table("usuarios").select("*").eq("email", email).execute()
+            
+            if not response.data:
+                return None
+            
+            usuario = response.data[0]
+            
+            # Verificar senha
+            if verify_password(senha, usuario['senha']):
+                # Remover senha do retorno por segurança
+                usuario.pop('senha', None)
+                return usuario
+            
+            return None
+        except Exception as e:
+            raise Exception(f"Erro ao autenticar: {str(e)}")
+
     def listar(self) -> List[Dict[str, Any]]:
         try:
-            return self.repo.list_usuarios()
+            usuarios = self.repo.list_usuarios()
+            # Remover senhas do retorno
+            for usuario in usuarios:
+                usuario.pop('senha', None)
+            return usuarios
         except APIError as e:
             raise Exception(f"Erro ao listar usuários: {e.message}")
         except Exception as e:
@@ -152,7 +157,11 @@ class UserService:
             if not isinstance(usuario_id, int) or usuario_id <= 0:
                 raise ValueError("ID do usuário deve ser um número positivo")
             
-            return self.repo.get_usuario(usuario_id)
+            usuario = self.repo.get_usuario(usuario_id)
+            if usuario:
+                # Remover senha do retorno
+                usuario.pop('senha', None)
+            return usuario
         except ValueError as e:
             raise Exception(f"Validação falhou: {str(e)}")
         except APIError as e:
@@ -169,13 +178,19 @@ class UserService:
             if "email" in payload and not self._validar_email(payload["email"]):
                 raise ValueError("Email inválido")
             
-            if "senha" in payload and not self._validar_senha(payload["senha"]):
-                raise ValueError("Senha deve ter no mínimo 6 caracteres")
+            if "senha" in payload:
+                if not self._validar_senha(payload["senha"]):
+                    raise ValueError("Senha deve ter no mínimo 6 caracteres")
+                # Hash da nova senha
+                payload["senha"] = hash_password(payload["senha"])
             
             if "nome" in payload and len(payload["nome"]) < 2:
                 raise ValueError("Nome deve ter no mínimo 2 caracteres")
             
-            return self.repo.update_usuario(usuario_id, payload)
+            usuario = self.repo.update_usuario(usuario_id, payload)
+            # Remover senha do retorno
+            usuario.pop('senha', None)
+            return usuario
         except ValueError as e:
             raise Exception(f"Validação falhou: {str(e)}")
         except APIError as e:
