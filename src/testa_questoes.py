@@ -6,7 +6,9 @@ from src.telas.salas.sala import Sala
 from src.telas.login.login import LoginScreen
 from src.telas.menu.menu import MenuTela
 from src.telas.progresso.progresso import ProgressoTela
+from src.db.supabase_class import SupabaseClient
 
+supabase = SupabaseClient()
 pygame.init()
 screen = pygame.display.set_mode((1000, 700))
 clock = pygame.time.Clock()
@@ -36,6 +38,7 @@ questoes = sala.embaralha_questoes()
 
 numero_fase = 0
 sala_started = False
+
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -46,6 +49,7 @@ while running:
    
     if numero_fase == 0 and not sala_started:
         sala.tela_sala()
+        questoes_certas = 0
         sala_started = True
 
     resposta = questoes[numero_fase].tela(screen, vidas)
@@ -56,6 +60,7 @@ while running:
     if resposta == True:
         print("Usuário acertou a questão!")
         numero_fase += 1
+        questoes_certas += 1
         sleep(0.3)
     elif resposta == False:
         print("Usuário errou a questão!")
@@ -65,10 +70,13 @@ while running:
 
     if vidas == 0:
         print("Game Over!")
+        supabase.client.table("resultados").update({f"score_{sala.numero_sala + 1}": questoes_certas}).eq("id_aluno", usuario['user']['id_usuario']).execute()
         running = False
     
     if numero_fase >= len(questoes):
         print("Parabéns! Você completou todas as questões da sala.")
+        
+        supabase.client.table("resultados").update({f"score_{sala.numero_sala + 1}": questoes_certas}).eq("id_aluno", usuario['user']['id_usuario']).execute()
 
 
         sala = todas_salas[sala.numero_sala + 1]
