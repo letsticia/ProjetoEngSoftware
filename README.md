@@ -13,9 +13,13 @@ O BitStart é um jogo educacional voltado ao ensino introdutório de algoritmos 
 ## Tecnologias Utilizadas
 
 - Linguagem de Programação: Python
-- Biblioteca Gráfica: Pygame
+
 <img src="src/img/logo.png" align="right" width="150">
+
+- Biblioteca Gráfica: Pygame
+
 - Controle de Versão: Git
+
 - Banco de Dados: Supabase
 
 ## Como Executar o Projeto
