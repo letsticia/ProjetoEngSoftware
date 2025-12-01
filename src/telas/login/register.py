@@ -1,5 +1,6 @@
 import pygame
 from src.services.user_service import UserService
+from src.componentes.botao import Botao
 
 
 class RegisterScreen:
@@ -31,7 +32,7 @@ class RegisterScreen:
 
         running = True
         while running:
-            # Precompute link rect so clicks can be detected in the event loop
+         
             link_font = pygame.font.Font(font_path, 16) if pygame.font else pygame.font.SysFont(None, 16)
             link_text = link_font.render("Já tem uma conta? conecte-se aqui", True, (20, 100, 200))
             link_rect = link_text.get_rect(topleft=(250, 530))
@@ -56,7 +57,7 @@ class RegisterScreen:
                         active = 0
 
                    
-                    if 400 <= mx <= 600 and 470 <= my <= 510:
+                    if 410 <= mx <= 600 and 470 <= my <= 510:
                         try:
                             payload_usuario = {
                                 "nome": nome,
@@ -157,10 +158,11 @@ class RegisterScreen:
             self.screen.blit(font.render(id_turma, True, (0, 0, 0)), (turma_rect.x + 8, turma_rect.y + 8))
 
           
-            reg_rect = pygame.Rect(400, 470, 200, 40)
-            pygame.draw.rect(self.screen, (34, 139, 34), reg_rect)
-            reg_text = font.render("Criar Conta", True, (255, 255, 255))
-            self.screen.blit(reg_text, reg_text.get_rect(center=reg_rect.center))
+            
+            botao_verde = pygame.image.load("src/img/botao/botao_verde.png").convert_alpha()
+            botao_registrar = Botao( x=410, y=460, imagem=botao_verde, text="Criar Conta", escala=0.4)
+            botao_registrar.draw(self.screen)
+
 
             link_font = pygame.font.Font(font_path, 16) if pygame.font else pygame.font.SysFont(None, 16)
             link_text = link_font.render("Já tem uma conta? conecte-se aqui", True, (20, 100, 200))
@@ -168,7 +170,7 @@ class RegisterScreen:
             self.screen.blit(link_text, link_rect)
 
             if error:
-                self.screen.blit(font.render(str(error), True, (200, 30, 30)), (250, 510))
+                self.screen.blit(font.render(str(error), True, (200, 30, 30)), (250, 570))
                 print("Erro no registro:", error)
             if success:
                 self.screen.blit(font.render(str(success), True, (30, 120, 30)), (250, 510))

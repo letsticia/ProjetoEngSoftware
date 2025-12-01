@@ -1,6 +1,7 @@
 import pygame
 from src.services.user_service import UserService
 from src.telas.login.register import RegisterScreen
+from src.componentes.botao import Botao
 
 
 class LoginScreen:
@@ -74,7 +75,7 @@ class LoginScreen:
            
             logo_rect = game_logo.get_rect(center=(500, 80))
             self.screen.blit(game_logo, logo_rect)
-            title_font = pygame.font.Font(font_path, 36) if pygame.font else pygame.font.SysFont(None, 36)
+            title_font = pygame.font.Font(font_path, 30) if pygame.font else pygame.font.SysFont(None, 30)
             title_surf = title_font.render("Login", True, (0, 0, 0))
             title_rect = title_surf.get_rect(center=(500, 160))
             self.screen.blit(title_surf, title_rect)
@@ -95,11 +96,14 @@ class LoginScreen:
             senha_surf = font.render(senha_mask, True, (0, 0, 0))
             self.screen.blit(senha_surf, (senha_rect.x + 8, senha_rect.y + 8))
 
-            login_rect = pygame.Rect(425, 380, 150, 40)
-            pygame.draw.rect(self.screen, (30, 144, 255), login_rect)
-            login_text = font.render("Entrar", True, (255, 255, 255))
-            lt_rect = login_text.get_rect(center=login_rect.center)
-            self.screen.blit(login_text, lt_rect)
+            # login_rect = pygame.Rect(425, 380, 150, 40)
+            # pygame.draw.rect(self.screen, (30, 144, 255), login_rect)
+            # login_text = font.render("Entrar", True, (255, 255, 255))
+            # lt_rect = login_text.get_rect(center=login_rect.center)
+            # self.screen.blit(login_text, lt_rect)
+            botao_azul = pygame.image.load("src/img/botao/botao_azul.png").convert_alpha()
+            botao_login = Botao( x=425, y=380, imagem=botao_azul, text="Entrar", escala=0.4)
+            botao_login.draw(self.screen)
 
        
             if error:
