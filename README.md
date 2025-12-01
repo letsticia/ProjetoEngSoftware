@@ -6,7 +6,7 @@ Este repositório contém o código-fonte do projeto "Bit Start", desenvolvido c
 
 ## Descrição do Projeto
 
-O BitStart é um jogo educacional voltado ao ensino introdutório de algoritmos e lógica  de programação para alunos ingressantes no curso de BTI - UFERSA. Com uma identidade  visual inspirada em jogos pixelados 8-bit, o aplicativo busca tornar o aprendizado de conceitos básicos de lógica e programação mais interativo, acessível e lúdico.O jogo é composto por fases de quizes e puzzles que desafiam os jogadores a aplicar conceitos fundamentais de algoritmos, como estruturas condicionais, loops e variáveis. 
+O BitStart é um jogo educacional voltado ao ensino introdutório de algoritmos e lógica  de programação para alunos ingressantes no curso de BTI - UFERSA. Com uma identidade  visual inspirada em jogos pixelados 8-bit, o aplicativo busca tornar o aprendizado de conceitos básicos de lógica e programação mais interativo, acessível e lúdico. O jogo é composto por fases de quizes e puzzles que desafiam os jogadores a aplicar conceitos fundamentais de algoritmos, como estruturas condicionais, loops e variáveis. 
 
 
 
