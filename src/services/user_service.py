@@ -45,7 +45,7 @@ class UserService:
     def criar_usuario_basico(self, payload: Dict[str, Any]) -> Dict[str, Any]:
         try:
             self._validar_usuario_basico(payload)
-            # Hash da senha antes de salvar
+            # Hash da senha AQUI (único lugar)
             payload["senha"] = hash_password(payload["senha"])
             return self.repo.create_usuario(payload)
         except ValueError as e:
@@ -65,9 +65,10 @@ class UserService:
                 raise ValueError("Departamento deve ter no mínimo 2 caracteres")
             
             payload_usuario["tipo"] = "professor"
-            # Hash da senha antes de salvar
+            # Hash da senha AQUI (único lugar)
             payload_usuario["senha"] = hash_password(payload_usuario["senha"])
             usuario = self.repo.create_usuario(payload_usuario)
+            
             payload_prof["id_prof"] = usuario["id_usuario"]
             prof_data = self.client.table("professores").insert(payload_prof).execute()
             return {**usuario, "detalhes_professor": prof_data.data[0]}
@@ -97,9 +98,10 @@ class UserService:
                 raise ValueError("ID da turma deve ser um número positivo")
             
             payload_usuario["tipo"] = "aluno"
-            # Hash da senha antes de salvar
+            # Hash da senha AQUI (único lugar)
             payload_usuario["senha"] = hash_password(payload_usuario["senha"])
             usuario = self.repo.create_usuario(payload_usuario)
+            
             payload_aluno["id_aluno"] = usuario["id_usuario"]
             aluno_data = self.client.table("alunos").insert(payload_aluno).execute()
             return {**usuario, "detalhes_aluno": aluno_data.data[0]}
