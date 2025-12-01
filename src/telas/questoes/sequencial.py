@@ -3,15 +3,18 @@ from src.componentes.botao import Botao
 from src.telas.questoes.questao import Questao
 from src.db.supabase_class import SupabaseClient
 from src.componentes.coracao import sprite_coracao
+from src.ui.feedback import show_incorrect_feedback
 import os
 
 class Sequencial(Questao):
-    def __init__(self, enunciado, opcoes, resposta_correta):
-        super().__init__(enunciado, opcoes, resposta_correta)
+    def __init__(self, enunciado, opcoes, resposta_correta, explicacao=None):
+        super().__init__(enunciado, opcoes, resposta_correta, explicacao)
        
         self.selected = []
         self.feedback = None 
         self.locked = False
+        self.overlay_pending = False      
+        self._correct_display = None      
     
     def tela(self, screen, vidas):
         font = pygame.font.Font("src/fonts/Grand9K Pixel.ttf", 26)
@@ -49,6 +52,9 @@ class Sequencial(Questao):
                         self.feedback = "correto"
                         print("Resposta correta")
                     else:
+                        correct_display = ", ".join(expected) if isinstance(expected, list) else str(self.resposta_correta)
+                        self._correct_display = correct_display
+                        self.overlay_pending = True
                         self.feedback = "errado"
                         print("Resposta incorreta")
                     self.locked = True
@@ -76,6 +82,11 @@ class Sequencial(Questao):
             fb_surf = label_font.render(self.feedback.upper(), True, fb_color)
             screen.blit(fb_surf, (resposta_x + 500, resposta_y))
         
+            if self.feedback == "errado" and getattr(self, "overlay_pending", False):
+                pygame.display.flip()
+                show_incorrect_feedback(screen, self._correct_display, self.explicacao, timeout=0)
+                self.overlay_pending = False
+
             if self.feedback == "correto":
                 return True
             else:

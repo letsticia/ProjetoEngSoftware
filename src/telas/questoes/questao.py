@@ -1,10 +1,11 @@
 import pygame
 
 class Questao:
-    def __init__(self, enunciado, opcoes, resposta_correta):
+    def __init__(self, enunciado, opcoes, resposta_correta, explicacao=None):
         self.enunciado = enunciado
         self.opcoes = opcoes
         self.resposta_correta = resposta_correta
+        self.explicacao = explicacao  
     
     def wrap_text(self, text, font, max_width):
             lines = []
