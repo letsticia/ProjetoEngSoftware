@@ -4,17 +4,25 @@ import pygame
 from time import sleep
 from src.telas.salas.sala import Sala
 from src.telas.login.login import LoginScreen
+from src.telas.menu.menu import MenuTela
 
 pygame.init()
 screen = pygame.display.set_mode((1000, 700))
 clock = pygame.time.Clock()
 
-# Exigir autenticação antes de prosseguir
+
 login = LoginScreen(screen, clock)
 autenticated = login.run()
 if not autenticated:
     pygame.quit()
     raise SystemExit("Autenticação necessária para conectar.")
+
+menu = MenuTela(screen)
+escolha_menu = menu.menu_principal()
+if escolha_menu == "sair":
+    running = False
+elif escolha_menu == "jogar":
+    running = True
 
 
 todas_salas = [
@@ -28,7 +36,6 @@ vidas = 3
 sala = todas_salas[0]
 questoes = sala.embaralha_questoes()
 
-running = True
 numero_fase = 0
 sala_started = False
 while running:
@@ -38,6 +45,7 @@ while running:
 
     screen.fill((252, 255, 217))
     
+   
     if numero_fase == 0 and not sala_started:
         sala.tela_sala()
         sala_started = True

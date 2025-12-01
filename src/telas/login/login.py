@@ -69,13 +69,17 @@ class LoginScreen:
                             senha += event.unicode
 
             self.screen.fill((252, 255, 217))
-
+            game_logo = pygame.image.load("src/img/logo.png")
+            game_logo = pygame.transform.scale(game_logo, (game_logo.get_width() // 2.5, game_logo.get_height() // 2.5))
+           
+            logo_rect = game_logo.get_rect(center=(500, 80))
+            self.screen.blit(game_logo, logo_rect)
             title_font = pygame.font.Font(font_path, 36) if pygame.font else pygame.font.SysFont(None, 36)
-            title_surf = title_font.render("Login do Jogo", True, (0, 0, 0))
-            title_rect = title_surf.get_rect(center=(500, 120))
+            title_surf = title_font.render("Login", True, (0, 0, 0))
+            title_rect = title_surf.get_rect(center=(500, 160))
             self.screen.blit(title_surf, title_rect)
 
-            # Email label + box
+          
             self._draw_text("Email:", font, (0, 0, 0), 250, 190)
             email_rect = pygame.Rect(250, 220, 500, 40)
             pygame.draw.rect(self.screen, (255, 255, 255), email_rect)
@@ -83,7 +87,6 @@ class LoginScreen:
             email_surf = font.render(email, True, (0, 0, 0))
             self.screen.blit(email_surf, (email_rect.x + 8, email_rect.y + 8))
 
-            # Senha label + box
             self._draw_text("Senha:", font, (0, 0, 0), 250, 270)
             senha_rect = pygame.Rect(250, 300, 500, 40)
             pygame.draw.rect(self.screen, (255, 255, 255), senha_rect)
@@ -92,37 +95,36 @@ class LoginScreen:
             senha_surf = font.render(senha_mask, True, (0, 0, 0))
             self.screen.blit(senha_surf, (senha_rect.x + 8, senha_rect.y + 8))
 
-            # Button
             login_rect = pygame.Rect(425, 380, 150, 40)
             pygame.draw.rect(self.screen, (30, 144, 255), login_rect)
             login_text = font.render("Entrar", True, (255, 255, 255))
             lt_rect = login_text.get_rect(center=login_rect.center)
             self.screen.blit(login_text, lt_rect)
 
-            # Error
+       
             if error:
                 err_surf = font.render(error, True, (200, 30, 30))
                 self.screen.blit(err_surf, (250, 440))
 
-            # Link para criar conta
+            
             link_text = font.render("Não tem uma conta? Criar", True, (20, 100, 200))
             link_rect = link_text.get_rect(topleft=(250, 480))
             self.screen.blit(link_text, link_rect)
 
-            # detectar clique no link
+        
             if pygame.mouse.get_pressed()[0]:
                 mx, my = pygame.mouse.get_pos()
                 if link_rect.collidepoint((mx, my)):
-                    # abrir tela de registro
+               
                     register = RegisterScreen(self.screen, self.clock)
                     created = register.run()
                     if created:
-                        # tentar autenticar automaticamente se possível
+                     
                         try:
                             self.user_service.autenticar(email, senha)
                             return True
                         except Exception:
-                            # voltar para login após registro
+                     
                             pass
 
             pygame.display.flip()

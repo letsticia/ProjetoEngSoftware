@@ -55,7 +55,7 @@ class RegisterScreen:
                     else:
                         active = 0
 
-                    # Register button
+                   
                     if 400 <= mx <= 600 and 470 <= my <= 510:
                         try:
                             payload_usuario = {
@@ -73,7 +73,7 @@ class RegisterScreen:
 
                             self.user_service.criar_aluno(payload_usuario, payload_aluno)
                             success = "Usuário criado com sucesso. Fazendo login..."
-                            # tentar autenticar automaticamente
+                          
                             try:
                                 self.user_service.autenticar(email, senha)
                                 return True
@@ -81,7 +81,7 @@ class RegisterScreen:
                                 return True
                         except Exception as e:
                             error = str(e)
-                    # Click on back-to-login link
+               
                     if link_rect.collidepoint((mx, my)):
                         return False
 
@@ -121,22 +121,20 @@ class RegisterScreen:
             title_rect = title_surf.get_rect(center=(500, 80))
             self.screen.blit(title_surf, title_rect)
 
-            # Inputs (spaced vertically)
-            # Nome
+           
             self._draw_text("Nome:", font, (0, 0, 0), 250, 90)
             nome_rect = pygame.Rect(250, 120, 500, 40)
             pygame.draw.rect(self.screen, (255, 255, 255), nome_rect)
             pygame.draw.rect(self.screen, (0, 0, 0), nome_rect, 2 if active == 1 else 1)
             self.screen.blit(font.render(nome, True, (0, 0, 0)), (nome_rect.x + 8, nome_rect.y + 8))
 
-            # Email
             self._draw_text("Email:", font, (0, 0, 0), 250, 160)
             email_rect = pygame.Rect(250, 190, 500, 40)
             pygame.draw.rect(self.screen, (255, 255, 255), email_rect)
             pygame.draw.rect(self.screen, (0, 0, 0), email_rect, 2 if active == 2 else 1)
             self.screen.blit(font.render(email, True, (0, 0, 0)), (email_rect.x + 8, email_rect.y + 8))
 
-            # Senha
+  
             self._draw_text("Senha:", font, (0, 0, 0), 250, 230)
             senha_rect = pygame.Rect(250, 260, 500, 40)
             pygame.draw.rect(self.screen, (255, 255, 255), senha_rect)
@@ -144,27 +142,26 @@ class RegisterScreen:
             senha_mask = "*" * len(senha)
             self.screen.blit(font.render(senha_mask, True, (0, 0, 0)), (senha_rect.x + 8, senha_rect.y + 8))
 
-            # Matrícula
+     
             self._draw_text("Matrícula:", font, (0, 0, 0), 250, 300)
             mat_rect = pygame.Rect(250, 330, 500, 40)
             pygame.draw.rect(self.screen, (255, 255, 255), mat_rect)
             pygame.draw.rect(self.screen, (0, 0, 0), mat_rect, 2 if active == 4 else 1)
             self.screen.blit(font.render(matricula, True, (0, 0, 0)), (mat_rect.x + 8, mat_rect.y + 8))
 
-            # ID Turma
+  
             self._draw_text("ID Turma:", font, (0, 0, 0), 250, 370)
             turma_rect = pygame.Rect(250, 400, 500, 40)
             pygame.draw.rect(self.screen, (255, 255, 255), turma_rect)
             pygame.draw.rect(self.screen, (0, 0, 0), turma_rect, 2 if active == 5 else 1)
             self.screen.blit(font.render(id_turma, True, (0, 0, 0)), (turma_rect.x + 8, turma_rect.y + 8))
 
-            # Register button
+          
             reg_rect = pygame.Rect(400, 470, 200, 40)
             pygame.draw.rect(self.screen, (34, 139, 34), reg_rect)
             reg_text = font.render("Criar Conta", True, (255, 255, 255))
             self.screen.blit(reg_text, reg_text.get_rect(center=reg_rect.center))
 
-            # Back to login link
             link_font = pygame.font.Font(font_path, 16) if pygame.font else pygame.font.SysFont(None, 16)
             link_text = link_font.render("Já tem uma conta? conecte-se aqui", True, (20, 100, 200))
             link_rect = link_text.get_rect(topleft=(250, 530))
@@ -172,6 +169,7 @@ class RegisterScreen:
 
             if error:
                 self.screen.blit(font.render(str(error), True, (200, 30, 30)), (250, 510))
+                print("Erro no registro:", error)
             if success:
                 self.screen.blit(font.render(str(success), True, (30, 120, 30)), (250, 510))
 
