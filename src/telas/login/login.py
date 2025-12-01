@@ -31,28 +31,42 @@ class LoginScreen:
         while running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    return False
+                    return False, None
+                    
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     mx, my = pygame.mouse.get_pos()
                     # email box
                     if 250 <= mx <= 750 and 220 <= my <= 260:
                         active = 1
+                        error = None  # Limpar erro ao clicar
                     elif 250 <= mx <= 750 and 300 <= my <= 340:
                         active = 2
+                        error = None  # Limpar erro ao clicar
                     else:
                         active = 0
+                        
                     # login button
                     if 425 <= mx <= 575 and 380 <= my <= 420:
-                        try:
-                            usuario = self.user_service.autenticar(email, senha)
-                            return True, usuario
-                        except Exception as e:
-                            error = str(e)
+                        if not email or not senha:
+                            error = "Preencha email e senha!"
+                        else:
+                            try:
+                                usuario = self.user_service.autenticar(email, senha)
+                                if usuario:  # ← VERIFICAÇÃO ADICIONADA
+                                    print(f"✅ Login bem-sucedido: {usuario['nome']}")
+                                    return True, usuario
+                                else:
+                                    error = "Email ou senha incorretos!"
+                            except Exception as e:
+                                error = f"Erro: {str(e)}"
+                                print(f"❌ Erro de autenticação: {e}")
 
                 if event.type == pygame.KEYDOWN:
                     if active == 1:
                         if event.key == pygame.K_BACKSPACE:
                             email = email[:-1]
+                        elif event.key == pygame.K_TAB:
+                            active = 2
                         elif event.key == pygame.K_RETURN:
                             active = 2
                         else:
@@ -61,11 +75,19 @@ class LoginScreen:
                         if event.key == pygame.K_BACKSPACE:
                             senha = senha[:-1]
                         elif event.key == pygame.K_RETURN:
-                            try:
-                                usuario = self.user_service.autenticar(email, senha)
-                                return True, usuario
-                            except Exception as e:
-                                error = str(e)
+                            if not email or not senha:
+                                error = "Preencha email e senha!"
+                            else:
+                                try:
+                                    usuario = self.user_service.autenticar(email, senha)
+                                    if usuario:  # ← VERIFICAÇÃO ADICIONADA
+                                        print(f"✅ Login bem-sucedido: {usuario['nome']}")
+                                        return True, usuario
+                                    else:
+                                        error = "Email ou senha incorretos!"
+                                except Exception as e:
+                                    error = f"Erro: {str(e)}"
+                                    print(f"❌ Erro de autenticação: {e}")
                         else:
                             senha += event.unicode
 
@@ -80,7 +102,7 @@ class LoginScreen:
             title_rect = title_surf.get_rect(center=(500, 160))
             self.screen.blit(title_surf, title_rect)
 
-          
+            # Email input
             self._draw_text("Email:", font, (0, 0, 0), 250, 190)
             email_rect = pygame.Rect(250, 220, 500, 40)
             pygame.draw.rect(self.screen, (255, 255, 255), email_rect)
@@ -88,6 +110,7 @@ class LoginScreen:
             email_surf = font.render(email, True, (0, 0, 0))
             self.screen.blit(email_surf, (email_rect.x + 8, email_rect.y + 8))
 
+            # Senha input
             self._draw_text("Senha:", font, (0, 0, 0), 250, 270)
             senha_rect = pygame.Rect(250, 300, 500, 40)
             pygame.draw.rect(self.screen, (255, 255, 255), senha_rect)
@@ -96,39 +119,35 @@ class LoginScreen:
             senha_surf = font.render(senha_mask, True, (0, 0, 0))
             self.screen.blit(senha_surf, (senha_rect.x + 8, senha_rect.y + 8))
 
-            # login_rect = pygame.Rect(425, 380, 150, 40)
-            # pygame.draw.rect(self.screen, (30, 144, 255), login_rect)
-            # login_text = font.render("Entrar", True, (255, 255, 255))
-            # lt_rect = login_text.get_rect(center=login_rect.center)
-            # self.screen.blit(login_text, lt_rect)
+            # Botão de login
             botao_azul = pygame.image.load("src/img/botao/botao_azul.png").convert_alpha()
-            botao_login = Botao( x=425, y=380, imagem=botao_azul, text="Entrar", escala=0.4)
+            botao_login = Botao(x=425, y=380, imagem=botao_azul, text="Entrar", escala=0.4)
             botao_login.draw(self.screen)
 
-       
+            # Erro
             if error:
                 err_surf = font.render(error, True, (200, 30, 30))
-                self.screen.blit(err_surf, (250, 440))
+                err_rect = err_surf.get_rect(center=(500, 450))
+                self.screen.blit(err_surf, err_rect)
 
-            
+            # Link para registro
             link_text = font.render("Não tem uma conta? Criar", True, (20, 100, 200))
             link_rect = link_text.get_rect(topleft=(250, 480))
             self.screen.blit(link_text, link_rect)
 
-        
+            # Click no link de registro
             if pygame.mouse.get_pressed()[0]:
                 mx, my = pygame.mouse.get_pos()
                 if link_rect.collidepoint((mx, my)):
-               
+                    pygame.time.wait(200)  # Debounce
                     register = RegisterScreen(self.screen, self.clock)
-                    created = register.run()
-                    if created:
-                        try:
-                            usuario = self.user_service.autenticar(email, senha)
-                            return True, usuario
-                        except Exception:
-                     
-                            pass
+                    created_user = register.run()
+                    
+                    # Se usuário foi criado, preencher campos automaticamente
+                    if created_user:
+                        email = created_user.get('email', '')
+                        # Não preencher senha por segurança
+                        error = "Conta criada! Digite sua senha para entrar."
 
             pygame.display.flip()
             self.clock.tick(30)
