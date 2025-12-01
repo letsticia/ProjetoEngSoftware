@@ -1,11 +1,13 @@
 import pygame
 from src.componentes.botao import Botao
+from src.telas.progresso.progresso import ProgressoTela
 
 class MenuTela:
-    def __init__(self, screen):
+    def __init__(self, screen, usuario):
         self.screen = screen
         self.clock = pygame.time.Clock()
         self.font_path = "src/fonts/Grand9K Pixel.ttf"
+        self.usuario = usuario
         
         try:
             self.font = pygame.font.Font(self.font_path, 30)
@@ -18,7 +20,8 @@ class MenuTela:
         while running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    return "sair"
+                    pygame.quit()
+                    raise SystemExit("Usuário saiu do jogo.")
 
             self.screen.fill((252, 255, 217))
             self.logo_img = pygame.image.load("src/img/logo.png")
@@ -28,20 +31,21 @@ class MenuTela:
             self.screen.blit(self.logo_img, logo_rect)
             
   
-            botao_vermelho = pygame.image.load("src/img/botao/botao_vermelho.png").convert_alpha()
+            botao_laranja = pygame.image.load("src/img/botao/botao_laranja.png").convert_alpha()
             botao_verde = pygame.image.load("src/img/botao/botao_verde.png").convert_alpha()
-            botao_azul = pygame.image.load("src/img/botao/botao_azul.png").convert_alpha()
+            botao_vermelho = pygame.image.load("src/img/botao/botao_vermelho.png").convert_alpha()
 
-            botao_jogar = Botao( x=410, y=200, imagem=botao_vermelho, text="Jogar", escala=0.5)
-            botao_configuracoes = Botao( x=410, y=300, imagem=botao_verde, text="Configurações", escala=0.5)
-            botao_sair = Botao( x=410, y=400, imagem=botao_azul, text="Sair", escala=0.5)
-
+            botao_jogar = Botao( x=410, y=200, imagem=botao_laranja, text="Jogar", escala=0.5)
+            botao_progresso = Botao( x=410, y=300, imagem=botao_verde, text="Progresso", escala=0.5)
+            botao_sair = Botao( x=410, y=400, imagem=botao_vermelho, text="Sair", escala=0.5)
             if botao_jogar.draw(self.screen):
-                return "jogar"
-            if botao_configuracoes.draw(self.screen):
-                return "configuracoes"
+                return True
+            if botao_progresso.draw(self.screen):
+                progresso_tela = ProgressoTela(self.screen, self.usuario['user']['id_usuario'])
+                progresso_surf = progresso_tela.mostrar_progresso()
             if botao_sair.draw(self.screen):
-                return "sair"
+                pygame.quit()
+                raise SystemExit("Usuário saiu do jogo.")
  
             pygame.display.flip()
             self.clock.tick(60)

@@ -43,8 +43,8 @@ class LoginScreen:
                     # login button
                     if 425 <= mx <= 575 and 380 <= my <= 420:
                         try:
-                            self.user_service.autenticar(email, senha)
-                            return True
+                            usuario = self.user_service.autenticar(email, senha)
+                            return True, usuario
                         except Exception as e:
                             error = str(e)
 
@@ -61,8 +61,8 @@ class LoginScreen:
                             senha = senha[:-1]
                         elif event.key == pygame.K_RETURN:
                             try:
-                                self.user_service.autenticar(email, senha)
-                                return True
+                                usuario = self.user_service.autenticar(email, senha)
+                                return True, usuario
                             except Exception as e:
                                 error = str(e)
                         else:
@@ -119,10 +119,9 @@ class LoginScreen:
                     register = RegisterScreen(self.screen, self.clock)
                     created = register.run()
                     if created:
-                     
                         try:
-                            self.user_service.autenticar(email, senha)
-                            return True
+                            usuario = self.user_service.autenticar(email, senha)
+                            return True, usuario
                         except Exception:
                      
                             pass
@@ -130,4 +129,4 @@ class LoginScreen:
             pygame.display.flip()
             self.clock.tick(30)
 
-        return False
+        return False, None

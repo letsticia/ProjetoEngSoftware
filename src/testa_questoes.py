@@ -5,6 +5,7 @@ from time import sleep
 from src.telas.salas.sala import Sala
 from src.telas.login.login import LoginScreen
 from src.telas.menu.menu import MenuTela
+from src.telas.progresso.progresso import ProgressoTela
 
 pygame.init()
 screen = pygame.display.set_mode((1000, 700))
@@ -12,18 +13,15 @@ clock = pygame.time.Clock()
 
 
 login = LoginScreen(screen, clock)
-autenticated = login.run()
+autenticated, usuario = login.run()
 if not autenticated:
     pygame.quit()
     raise SystemExit("Autenticação necessária para conectar.")
 
-menu = MenuTela(screen)
-escolha_menu = menu.menu_principal()
-if escolha_menu == "sair":
-    running = False
-elif escolha_menu == "jogar":
-    running = True
 
+menu = MenuTela(screen, usuario)
+
+running = menu.menu_principal()
 
 todas_salas = [
     Sala("Variáveis", 0, screen, clock),
