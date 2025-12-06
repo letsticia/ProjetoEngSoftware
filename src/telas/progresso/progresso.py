@@ -24,7 +24,7 @@ class ProgressoTela:
         fig = pylab.figure(figsize=[8, 5], dpi=100)
         ax = fig.gca()
 
-        categorias = ["Variáveis", "Estruturas Condicionais", "Laços de Repetição", "Funções"]
+        categorias = ["Variáveis", "Estruturas Condicionais", "Laços de Repetição", "Vetores"]
 
         
         ax.bar(categorias, progresso, color=['blue', 'orange', 'green', 'red'])

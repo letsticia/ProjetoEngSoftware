@@ -31,7 +31,7 @@ todas_salas = [
     Sala("Variáveis", 0, screen, clock),
     Sala("Estruturas Condicionais", 1, screen, clock),
     Sala("Laços de Repetição", 2, screen, clock),
-    Sala("Funções", 3, screen, clock)
+    Sala("Vetores", 3, screen, clock)
 ]
 
 # Controle de progresso do jogador
@@ -91,7 +91,10 @@ while running:
 
         if vidas == 0:
             print("Game Over!")
-            supabase.client.table("resultados").update({f"score_{sala.numero_sala + 1}": questoes_certas}).eq("id_aluno", usuario['id_usuario']).execute()
+            score_anterior = supabase.client.table("resultados").select(f"score_{sala.numero_sala + 1}").eq("id_aluno", usuario['id_usuario']).execute()
+            score_anterior_value = score_anterior.data[0][f"score_{sala.numero_sala + 1}"]
+            if questoes_certas > score_anterior_value:
+                supabase.client.table("resultados").update({f"score_{sala.numero_sala + 1}": questoes_certas}).eq("id_aluno", usuario['id_usuario']).execute()
             
             # Mostra a tela de Game Over
             gameover = GameOverTela(screen, clock, sala)
@@ -109,8 +112,13 @@ while running:
         if numero_fase >= len(questoes):
             print("Parabéns! Você completou todas as questões da sala.")
             
-            supabase.client.table("resultados").update({f"score_{sala.numero_sala + 1}": questoes_certas}).eq("id_aluno", usuario['id_usuario']).execute()
-            
+            score_anterior = supabase.client.table("resultados").select(f"score_{sala.numero_sala + 1}").eq("id_aluno", usuario['id_usuario']).execute()
+            score_anterior_value = score_anterior.data[0][f"score_{sala.numero_sala + 1}"]
+            if questoes_certas > score_anterior_value:
+                supabase.client.table("resultados").update({f"score_{sala.numero_sala + 1}": questoes_certas}).eq("id_aluno", usuario['id_usuario']).execute()
+                
+
+
             # Desbloqueia a próxima sala
             if sala.numero_sala >= sala_atual_index:
                 sala_atual_index = sala.numero_sala + 1
