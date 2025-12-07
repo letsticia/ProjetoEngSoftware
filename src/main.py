@@ -34,19 +34,30 @@ todas_salas = [
     Sala("Vetores", 3, screen, clock)
 ]
 
+# Função auxiliar para buscar progresso do BD
+def get_progresso_usuario():
+    progresso = supabase.client.table("resultados").select("*").eq("id_aluno", usuario['id_usuario']).execute()
+    if progresso.data == []:
+        supabase.client.table("resultados").insert({"id_aluno": usuario['id_usuario'], "score_1": 0, "score_2": 0, "score_3": 0, "score_4": 0}).execute()
+        return [0, 0, 0, 0]
+    else:
+        dados = progresso.data[0]
+        return [dados['score_1'], dados['score_2'], dados['score_3'], dados['score_4']]
+
 # Controle de progresso do jogador
-sala_atual_index = 0  # Última sala desbloqueada
-mundo = MundoTela(screen, clock, usuario, sala_atual_index)
+progresso_salas = get_progresso_usuario()
+mundo = MundoTela(screen, clock, usuario, progresso_salas)
 
 while running:
     # Mostra a tela do mundo para escolher a sala
     sala_escolhida = mundo.run()
     
     if sala_escolhida == -1:
-        # Usuário apertou ESC, volta ao menu
+        # Usuário entrou na porta Menu, volta ao menu
         running = menu.menu_principal()
         if running:
-            mundo = MundoTela(screen, clock, usuario, sala_atual_index)
+            progresso_salas = get_progresso_usuario()  # Atualiza progresso
+            mundo = MundoTela(screen, clock, usuario, progresso_salas)
         continue
     
     if sala_escolhida is None:
@@ -104,7 +115,8 @@ while running:
                 # Volta ao menu principal
                 running = menu.menu_principal()
                 if running:
-                    mundo = MundoTela(screen, clock, usuario, sala_atual_index)
+                    progresso_salas = get_progresso_usuario()  # Atualiza progresso
+                    mundo = MundoTela(screen, clock, usuario, progresso_salas)
             else:
                 running = False
             jogando_sala = False
@@ -116,18 +128,15 @@ while running:
             score_anterior_value = score_anterior.data[0][f"score_{sala.numero_sala + 1}"]
             if questoes_certas > score_anterior_value:
                 supabase.client.table("resultados").update({f"score_{sala.numero_sala + 1}": questoes_certas}).eq("id_aluno", usuario['id_usuario']).execute()
-                
-
-
-            # Desbloqueia a próxima sala
-            if sala.numero_sala >= sala_atual_index:
-                sala_atual_index = sala.numero_sala + 1
-                mundo.atualizar_salas_desbloqueadas(sala.numero_sala)
+            
+            # Atualiza o progresso e recria o mundo com salas desbloqueadas
+            progresso_salas = get_progresso_usuario()
+            mundo.atualizar_salas_desbloqueadas(progresso_salas)
             
             jogando_sala = False
             
             # Verifica se completou todas as salas
-            if sala_atual_index >= len(todas_salas):
+            if all(score > 0 for score in progresso_salas):
                 print("Parabéns! Você completou todas as salas do jogo!")
                 # Aqui você pode adicionar uma tela de vitória
 

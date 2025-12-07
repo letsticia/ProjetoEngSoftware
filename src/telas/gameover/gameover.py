@@ -15,7 +15,7 @@ class GameOverTela:
             0: "Revise o conceito de Variáveis:\nTipos de dados, declaração e atribuição.",
             1: "Revise Estruturas Condicionais:\nif, else, elif e operadores lógicos.",
             2: "Revise Laços de Repetição:\nfor, while e controle de fluxo.",
-            3: "Revise o conceito de Funções:\nDefinição, parâmetros e retorno."
+            3: "Revise o conceito de Vetores:\nArrays, listas e manipulação de dados."
         }
         
         try:

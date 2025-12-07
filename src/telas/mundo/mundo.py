@@ -479,11 +479,11 @@ class NaveBackground:
 class MundoTela:
     """Tela do mundo - Estilo BitStart com nave vista de cima"""
     
-    def __init__(self, screen, clock, usuario, sala_atual=0):
+    def __init__(self, screen, clock, usuario, progresso_salas):
         self.screen = screen
         self.clock = clock
         self.usuario = usuario
-        self.sala_atual = sala_atual
+        self.progresso_salas = progresso_salas  # [score_1, score_2, score_3, score_4]
         self.font_path = "src/fonts/Grand9K Pixel.ttf"
         
         # NOVO: Inicializa o background da nave
@@ -520,9 +520,22 @@ class MundoTela:
             x = centro_x + raio * math.cos(angulo) - 50
             y = centro_y + raio * math.sin(angulo) - 40
             
-            nomes = ["Variáveis", "Condicionais", "Loops", "Funções", "Arrays"]
+            # Nomes das salas - última é Menu
+            nomes = ["Variáveis", "Condicionais", "Loops", "Vetores", "Menu"]
+            
+            # Lógica de desbloqueio baseada no progresso
+            # Sala 0 sempre desbloqueada
+            # Salas 1-3 desbloqueadas se a anterior tem score > 0
+            # Sala 4 (Menu) sempre desbloqueada
+            if i == 0 or i == 4:  # Primeira sala e Menu sempre desbloqueados
+                desbloqueada = True
+            elif i <= 3:  # Salas de conteúdo
+                desbloqueada = progresso_salas[i - 1] > 0  # Desbloqueia se anterior completada
+            else:
+                desbloqueada = True
+            
             self.portas.append(
-                PortaSala(int(x), int(y), i, nomes[i], i == 0 or sala_atual >= i)
+                PortaSala(int(x), int(y), i, nomes[i], desbloqueada)
             )
         
         self.mensagem = ""
@@ -574,10 +587,14 @@ class MundoTela:
             self.screen.blit(titulo_bit, (self.screen.get_width() // 2 - 80, 25))
             self.screen.blit(titulo_start, (self.screen.get_width() // 2 - 10, 25))
     
-    def atualizar_salas_desbloqueadas(self, sala_completada):
-        self.sala_atual = sala_completada + 1
+    def atualizar_salas_desbloqueadas(self, progresso_salas):
+        """Atualiza o desbloqueio das salas baseado no progresso do BD"""
+        self.progresso_salas = progresso_salas
         for i, porta in enumerate(self.portas):
-            porta.desbloqueada = i <= self.sala_atual
+            if i == 0 or i == 4:  # Primeira sala e Menu sempre desbloqueados
+                porta.desbloqueada = True
+            elif i <= 3:  # Salas de conteúdo
+                porta.desbloqueada = progresso_salas[i - 1] > 0
     
     def verificar_colisao(self):
         robo_rect = self.robo.get_rect()
@@ -605,12 +622,12 @@ class MundoTela:
                         porta = self.verificar_colisao()
                         if porta:
                             if porta.desbloqueada:
+                                # Sala 4 é o Menu - retorna -1 para voltar ao menu
+                                if porta.numero == 4:
+                                    return -1
                                 return porta.numero
                             else:
                                 self.mostrar_mensagem("⚠ Sala bloqueada! Complete a anterior", 150)
-                    
-                    if event.key == pygame.K_ESCAPE:
-                        return -1
             
             # Movimento
             teclas = pygame.key.get_pressed()
@@ -642,8 +659,13 @@ class MundoTela:
           
             if porta_colisao:
                 if porta_colisao.desbloqueada:
-                    instrucao = self.font_pequena.render(
-                        "Pressione ENTER para entrar na sala", True, (100, 200, 120))
+                    # Mensagem diferente para porta Menu
+                    if porta_colisao.numero == 4:
+                        instrucao = self.font_pequena.render(
+                            "Pressione ENTER para voltar ao Menu", True, (255, 165, 80))
+                    else:
+                        instrucao = self.font_pequena.render(
+                            "Pressione ENTER para entrar na sala", True, (100, 200, 120))
                 else:
                     instrucao = self.font_pequena.render(
                         "BLOQUEADA - Complete a sala anterior", True, (255, 100, 100))
@@ -655,7 +677,7 @@ class MundoTela:
                     self.screen.blit(instrucao, instrucao_rect)
             else:
                 instrucao = self.font_pequena.render(
-                    "Setas: Mover  |  Enter: Entrar  |  Esc: Menu", True, (120, 120, 120))
+                    "Setas: Mover  |  Enter: Entrar/Selecionar", True, (120, 120, 120))
                 instrucao_rect = instrucao.get_rect(
                     center=(self.screen.get_width() // 2, barra_y + 35))
                 self.screen.blit(instrucao, instrucao_rect)
