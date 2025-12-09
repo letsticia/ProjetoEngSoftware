@@ -64,11 +64,11 @@ Ao executar o aplicativo, siga as instruções na tela para navegar pelo jogo.
 
 - Ao escolher a opção "Jogar", você será direcionado para as fases disponíveis. Complete os desafios para desbloquear fases subsequentes.
 
-![alt text](image-1.png)
+![alt text](image-4.png)
 
 - Na seção "Desempenho", você poderá visualizar suas estatísticas de jogo, incluindo acertos e progresso.
 
-![alt text](image-2.png)
+![alt text](image-5.png)
 
 - Ao clicar em "Sair", você retornará à tela inicial, podendo fazer login com outro usuário ou registrar-se novamente.
 ## Integrantes do Grupo
