@@ -525,12 +525,12 @@ class MundoTela:
             
             # Lógica de desbloqueio baseada no progresso
             # Sala 0 sempre desbloqueada
-            # Salas 1-3 desbloqueadas se a anterior tem score > 0
+            # Salas 1-3 desbloqueadas se a anterior tem score >= 2
             # Sala 4 (Menu) sempre desbloqueada
             if i == 0 or i == 4:  # Primeira sala e Menu sempre desbloqueados
                 desbloqueada = True
             elif i <= 3:  # Salas de conteúdo
-                desbloqueada = progresso_salas[i - 1] > 0  # Desbloqueia se anterior completada
+                desbloqueada = progresso_salas[i - 1] >= 2  # Desbloqueia se anterior tem pelo menos 2 acertos
             else:
                 desbloqueada = True
             
@@ -594,7 +594,7 @@ class MundoTela:
             if i == 0 or i == 4:  # Primeira sala e Menu sempre desbloqueados
                 porta.desbloqueada = True
             elif i <= 3:  # Salas de conteúdo
-                porta.desbloqueada = progresso_salas[i - 1] > 0
+                porta.desbloqueada = progresso_salas[i - 1] >= 2  # Requer pelo menos 2 acertos
     
     def verificar_colisao(self):
         robo_rect = self.robo.get_rect()
@@ -627,7 +627,7 @@ class MundoTela:
                                     return -1
                                 return porta.numero
                             else:
-                                self.mostrar_mensagem("⚠ Sala bloqueada! Complete a anterior", 150)
+                                self.mostrar_mensagem("⚠ Sala bloqueada! Faça 2+ acertos na anterior", 150)
             
             # Movimento
             teclas = pygame.key.get_pressed()
@@ -668,7 +668,7 @@ class MundoTela:
                             "Pressione ENTER para entrar na sala", True, (100, 200, 120))
                 else:
                     instrucao = self.font_pequena.render(
-                        "BLOQUEADA - Complete a sala anterior", True, (255, 100, 100))
+                        "BLOQUEADA - Faça 2+ acertos na sala anterior", True, (255, 100, 100))
                 
             
                 if (pygame.time.get_ticks() // 400) % 2 == 0:

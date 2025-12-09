@@ -136,8 +136,8 @@ while running:
             jogando_sala = False
             
             # Verifica se completou todas as salas
-            if all(score > 0 for score in progresso_salas):
-                print("Parabéns! Você completou todas as salas do jogo!")
+            if all(score >= 2 for score in progresso_salas):
+                print("Parabéns! Você completou todas as salas do jogo com sucesso!")
                 # Aqui você pode adicionar uma tela de vitória
 
 pygame.quit()
